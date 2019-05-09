@@ -1,0 +1,2 @@
+include versioneer.py
+include rsidx/_version.py

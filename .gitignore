@@ -1,0 +1,4 @@
+__pycache__/
+rsidx.egg-info/
+.coverage
+scratch/

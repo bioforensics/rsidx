@@ -1,0 +1,6 @@
+[report]
+show_missing = True
+
+[run]
+branch = True
+omit = rsidx/_version.py, rsidx/tests/*.py
