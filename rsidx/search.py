@@ -20,6 +20,16 @@ def trim_rsid(rsid):
     return rsidstr
 
 
+def filter_by_rsid(instream, rsidlist, header=False):
+    for line in instream:
+        if line.startswith('#'):
+            yield line
+            continue
+        chrom, coord, rsid, *values = line.split('\t')
+        if rsid[2:] in rsidlist:
+            yield line
+
+
 def search(rsidlist, dbconn, vcffile, header=False):
     c = dbconn.cursor()
     rsids = ', '.join(map(trim_rsid, rsidlist))
@@ -39,7 +49,7 @@ def search(rsidlist, dbconn, vcffile, header=False):
         tabixcmd.append('-h')
     tabixcmd.extend(coords)
     proc = Popen(tabixcmd, stdout=PIPE, universal_newlines=True)
-    for line in proc.stdout:
+    for line in filter_by_rsid(proc.stdout, rsids, header=header):
         yield line
 
 

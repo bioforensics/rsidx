@@ -99,3 +99,18 @@ def test_search_stdout(capsys):
     terminal = capsys.readouterr()
     outlines = terminal.out.strip().split('\n')
     assert len(outlines) == 5
+
+
+@pytest.mark.parametrize('doheader,numlines', [
+    (False, 1),
+    (True, 57 + 1),
+])
+def test_search_overlapping_variants(doheader, numlines):
+    rsidlist = ['rs8051733']
+    vcffile = data_file('overlap.vcf.gz')
+    idxfile = data_file('overlap.sqlite3')
+    conn = sqlite3.connect(idxfile)
+    outlines = list(rsidx.search.search(rsidlist, conn, vcffile, doheader))
+    assert len(outlines) == numlines
+    assert '\trs8051733\t' in outlines[-1]
+    assert '\rs967556605\t' not in outlines[-1]
