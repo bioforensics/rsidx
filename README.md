@@ -1,3 +1,6 @@
+[![BSD licensed][licensebadge]](https://github.com/bioforensics/rsidx/blob/master/LICENSE.txt)
+[![install with bioconda][biocondabadge]](http://bioconda.github.io/recipes/rsidx/README.html)
+
 # rsidx
 
 Daniel Standage, 2019  
@@ -11,14 +14,19 @@ This index is simply an sqlite3 database containing a mapping of rsID values to 
 
 ## Installation
 
-Installation with bioconda is pending.
-For now, the following installation procedure is recommended.
+Installation with bioconda is recommended.
+
+```
+conda install -c bioconda microhapulator
+```
+
+If you prefer installation with pip try the following.
 
 ```
 pip install git+https://github.com/bioforensics/rsidx
 ```
 
-This package requires that the program `tabix` be in your `$PATH`.
+> ***NOTE**: If you install `rsidx` with pip, you will need to install the program `tabix` on your own and ensure it is in your `$PATH` when running `rsidx`*.
 
 
 ## Demo: command line interface
@@ -48,3 +56,6 @@ with sqlite3.connect('myidx.db') as dbconn, open('myvar.vcf.gz', 'r') as vcffh:
     for line in rsidx.search.search(rsidlist, dbconn, vcffh)
         # process lines of VCF data
 ```
+
+[licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
+[biocondabadge]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
