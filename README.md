@@ -17,7 +17,7 @@ This index is simply an sqlite3 database containing a mapping of rsID values to 
 Installation with bioconda is recommended.
 
 ```
-conda install -c bioconda microhapulator
+conda install -c bioconda rsidx
 ```
 
 If you prefer installation with pip try the following.
