@@ -17,10 +17,11 @@ def parse_vcf(vcfstream, updateint=1e6):
     for n, line in enumerate(vcfstream):
         if line.startswith('#'):
             continue
-        chromstr, posstr, rsid, *values = line.split('\t')
-        if not rsid.startswith('rs'):
-            continue
-        yield int(rsid[2:]), chromstr, int(posstr)
+        chromstr, posstr, rsids, *values = line.split('\t')
+        for rsid in rsids.split(";"):
+            if not rsid.startswith('rs'):
+                continue
+            yield int(rsid[2:]), chromstr, int(posstr)
         if n >= threshold:
             threshold += updateint
             if threshold == updateint * 10:

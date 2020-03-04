@@ -25,9 +25,10 @@ def filter_by_rsid(instream, rsidlist, header=False):
         if line.startswith('#'):
             yield line
             continue
-        chrom, coord, rsid, *values = line.split('\t')
-        if rsid[2:] in rsidlist:
-            yield line
+        chrom, coord, rsids, *values = line.split('\t')
+        for rsid in rsids.split(';'):
+            if rsid[2:] in rsidlist:
+                yield line
 
 
 def search(rsidlist, dbconn, vcffile, header=False):
