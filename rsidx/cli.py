@@ -15,6 +15,10 @@ import rsidx
 def index_subparser(subparsers):
     cli = subparsers.add_parser('index')
     cli.add_argument(
+        '-f', '--force', action='store_true', help='force overwrite of index '
+        'file if it already exists'
+    )
+    cli.add_argument(
         '-c', '--cache-size', type=int, metavar='C', help='modify default '
         'sqlite3 cache size (in KiB)'
     )

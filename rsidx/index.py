@@ -7,6 +7,7 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+import os
 import rsidx
 import sqlite3
 import sys
@@ -49,6 +50,19 @@ def index(dbconn, vcffh, cache_size=None, mmap_size=None, logint=1e6):
 
 
 def main(args):
+    if os.path.exists(args.dbfile):
+        message = 'WARNING: index file "{:s}" exists'.format(args.dbfile)
+        if args.force:
+            message += ', overwriting'
+            try:
+                os.unlink(args.dbfile)
+            except FileNotFoundError:  # prevent exploits  # pragma: no cover
+                pass
+        else:
+            message += ', stubbornly refusing to proceed'
+        print('[rsidx]', message, file=sys.stderr)
+        if not args.force:
+            raise SystemExit
     with rsidx.open(args.vcf, 'r') as vcffh:
         with sqlite3.connect(args.dbfile) as dbconn:
             index(dbconn, vcffh, cache_size=args.cache_size,

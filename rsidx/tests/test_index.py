@@ -7,9 +7,10 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+import os
 import pytest
 import rsidx
-from rsidx.tests import data_file
+from rsidx.tests import data_file, TempFileName
 import sqlite3
 from tempfile import NamedTemporaryFile
 
@@ -91,11 +92,11 @@ def test_index_multi_rsids():
 
 @pytest.mark.parametrize('mainfunc', [rsidx.index.main, rsidx.__main__.main])
 def test_index_cli(mainfunc):
-    with NamedTemporaryFile(suffix='.sqlite3') as db:
-        arglist = ['index', data_file('chr17-sample.vcf.gz'), db.name]
+    with TempFileName(suffix='.rsidx') as dbfile:
+        arglist = ['index', data_file('chr17-sample.vcf.gz'), dbfile]
         args = rsidx.cli.get_parser().parse_args(arglist)
         mainfunc(args)
-        conn = sqlite3.connect(db.name)
+        conn = sqlite3.connect(dbfile)
         c = conn.cursor()
         query = (
             'SELECT * FROM rsid_to_coord WHERE rsid IN '
@@ -110,11 +111,32 @@ def test_index_cli(mainfunc):
 
 def test_index_multi(capsys):
     vcffile = data_file('chr9-multi.vcf.gz')
-    with NamedTemporaryFile(suffix='.rsidx') as db, rsidx.open(vcffile, 'r') as vcffh:
-        with sqlite3.connect(db.name) as dbconn:
+    with TempFileName(suffix='.rsidx') as dbfile, rsidx.open(vcffile, 'r') as vcffh:
+        with sqlite3.connect(dbfile) as dbconn:
             rsidx.index.index(dbconn, vcffh)
-        arglist = ['search', vcffile, db.name, 'rs60995877']
+        arglist = ['search', vcffile, dbfile, 'rs60995877']
         args = rsidx.cli.get_parser().parse_args(arglist)
         rsidx.search.main(args)
     terminal = capsys.readouterr()
     assert terminal.out.count('\trs60995877\t') == 7
+
+
+def test_index_no_force_reindex(capsys):
+    with TempFileName(suffix='.rsidx') as dbfile:
+        arglist = ['index', data_file('chr9-multi.vcf.gz'), dbfile]
+        args = rsidx.cli.get_parser().parse_args(arglist)
+        rsidx.index.main(args)
+        with pytest.raises(SystemExit):
+            rsidx.index.main(args)
+    terminal = capsys.readouterr()
+    assert ', stubbornly refusing to proceed' in terminal.err
+
+
+def test_index_force_reindex(capsys):
+    with TempFileName(suffix='.rsidx') as dbfile:
+        arglist = ['index', '--force', data_file('chr9-multi.vcf.gz'), dbfile]
+        args = rsidx.cli.get_parser().parse_args(arglist)
+        rsidx.index.main(args)
+        rsidx.index.main(args)
+    terminal = capsys.readouterr()
+    assert ', overwriting' in terminal.err
