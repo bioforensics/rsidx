@@ -44,7 +44,10 @@ def index(dbconn, vcffh, cache_size=None, mmap_size=None, logint=1e6):
     dbconn.commit()
 
     vcfstream = parse_vcf(vcffh, updateint=logint)
-    c.executemany('INSERT INTO rsid_to_coord VALUES (?,?,?)', vcfstream)
+    try:
+        c.executemany('INSERT INTO rsid_to_coord VALUES (?,?,?)', vcfstream)
+    except sqlite3.IntegrityError:
+        pass
     dbconn.commit()
 
 
