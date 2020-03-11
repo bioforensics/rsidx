@@ -25,18 +25,20 @@ def filter_by_rsid(instream, rsidlist, header=False):
         if line.startswith('#'):
             yield line
             continue
-        chrom, coord, rsid, *values = line.split('\t')
-        if rsid[2:] in rsidlist:
-            yield line
+        chrom, coord, rsids, *values = line.split('\t')
+        for rsid in rsids.split(';'):
+            if rsid[2:] in rsidlist:
+                yield line
+                break
 
 
 def search(rsidlist, dbconn, vcffile, header=False):
     c = dbconn.cursor()
     rsids = ', '.join(map(trim_rsid, rsidlist))
-    query = 'SELECT * FROM rsid_to_coord WHERE rsid IN ({:s})'.format(rsids)
+    query = 'SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid IN ({:s})'.format(rsids)
 
     def fmt(row):
-        return '{chr:s}:{coord:d}-{coord:d}'.format(chr=row[1], coord=row[2])
+        return '{chr:s}:{coord:d}-{coord:d}'.format(chr=row[0], coord=row[1])
     coords = [fmt(result) for result in c.execute(query)]
     if len(coords) == 0:
         print('[rsidx::search] WARNING: no rsID matches', file=sys.stderr)

@@ -52,6 +52,23 @@ def test_index_bogus_rsids():
             results = list(c.execute(query))
             assert results == [(1234497371, '4', 218446)]
 
+def test_index_multi_rsids():
+    with NamedTemporaryFile(suffix='.sqlite3') as db:
+        with sqlite3.connect(db.name) as dbconn:
+            vcffile = data_file('multiple_id.vcf.gz')
+            with rsidx.open(vcffile, 'r') as vcffh:
+                rsidx.index.index(dbconn, vcffh)
+            c = dbconn.cursor()
+            query = (
+                'SELECT * FROM rsid_to_coord WHERE rsid IN '
+                '(72634902, 145742571)'
+            )
+            results = list(c.execute(query))
+            assert sorted(results) == sorted([
+                (72634902, '1', 1900106),
+                (145742571, '1', 1900106)]
+            )
+
 
 @pytest.mark.parametrize('mainfunc', [rsidx.index.main, rsidx.__main__.main])
 def test_index_cli(mainfunc):
