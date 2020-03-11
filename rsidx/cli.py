@@ -15,6 +15,10 @@ import rsidx
 def index_subparser(subparsers):
     cli = subparsers.add_parser('index')
     cli.add_argument(
+        '-f', '--force', action='store_true', help='force overwrite of index '
+        'file if it already exists'
+    )
+    cli.add_argument(
         '-c', '--cache-size', type=int, metavar='C', help='modify default '
         'sqlite3 cache size (in KiB)'
     )
@@ -23,7 +27,7 @@ def index_subparser(subparsers):
         'memory map mode and specify mmap_size (in bytes)'
     )
     cli.add_argument('vcf', help='sorted VCF file to index')
-    cli.add_argument('dbfile', help='file to which sqlite3 db will be written')
+    cli.add_argument('idx', help='index file to create')
 
 
 def search_subparser(subparsers):
@@ -34,7 +38,7 @@ def search_subparser(subparsers):
         'default is terminal (stdout)'
     )
     cli.add_argument('vcf', help='sorted and indexed VCF file')
-    cli.add_argument('dbfile', help='rsidx index')
+    cli.add_argument('idx', help='rsidx index file')
     cli.add_argument('rsid', nargs='+', help='rsID(s) to search')
 
 
