@@ -50,12 +50,12 @@ def index(dbconn, vcffh, cache_size=None, mmap_size=None, logint=1e6):
 
 
 def main(args):
-    if os.path.exists(args.dbfile):
-        message = 'WARNING: index file "{:s}" exists'.format(args.dbfile)
+    if os.path.exists(args.idx):
+        message = 'WARNING: index file "{:s}" exists'.format(args.idx)
         if args.force:
             message += ', overwriting'
             try:
-                os.unlink(args.dbfile)
+                os.unlink(args.idx)
             except FileNotFoundError:  # prevent exploits  # pragma: no cover
                 pass
         else:
@@ -64,6 +64,6 @@ def main(args):
         if not args.force:
             raise SystemExit
     with rsidx.open(args.vcf, 'r') as vcffh:
-        with sqlite3.connect(args.dbfile) as dbconn:
+        with sqlite3.connect(args.idx) as dbconn:
             index(dbconn, vcffh, cache_size=args.cache_size,
                   mmap_size=args.mmap_size)

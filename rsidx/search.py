@@ -56,7 +56,7 @@ def search(rsidlist, dbconn, vcffile, header=False):
 
 
 def main(args):
-    conn = sqlite3.connect(args.dbfile)
+    conn = sqlite3.connect(args.idx)
     with rsidx.open(args.out, 'w') as out:
         for line in search(args.rsid, conn, args.vcf, header=args.header):
             print(line, end='', file=out)

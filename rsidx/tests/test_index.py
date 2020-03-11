@@ -92,11 +92,11 @@ def test_index_multi_rsids():
 
 @pytest.mark.parametrize('mainfunc', [rsidx.index.main, rsidx.__main__.main])
 def test_index_cli(mainfunc):
-    with TempFileName(suffix='.rsidx') as dbfile:
-        arglist = ['index', data_file('chr17-sample.vcf.gz'), dbfile]
+    with TempFileName(suffix='.rsidx') as idxfile:
+        arglist = ['index', data_file('chr17-sample.vcf.gz'), idxfile]
         args = rsidx.cli.get_parser().parse_args(arglist)
         mainfunc(args)
-        conn = sqlite3.connect(dbfile)
+        conn = sqlite3.connect(idxfile)
         c = conn.cursor()
         query = (
             'SELECT * FROM rsid_to_coord WHERE rsid IN '
@@ -111,10 +111,10 @@ def test_index_cli(mainfunc):
 
 def test_index_multi(capsys):
     vcffile = data_file('chr9-multi.vcf.gz')
-    with TempFileName(suffix='.rsidx') as dbfile, rsidx.open(vcffile, 'r') as vcffh:
-        with sqlite3.connect(dbfile) as dbconn:
+    with TempFileName(suffix='.rsidx') as idxfile, rsidx.open(vcffile, 'r') as vcffh:
+        with sqlite3.connect(idxfile) as dbconn:
             rsidx.index.index(dbconn, vcffh)
-        arglist = ['search', vcffile, dbfile, 'rs60995877']
+        arglist = ['search', vcffile, idxfile, 'rs60995877']
         args = rsidx.cli.get_parser().parse_args(arglist)
         rsidx.search.main(args)
     terminal = capsys.readouterr()
@@ -122,8 +122,8 @@ def test_index_multi(capsys):
 
 
 def test_index_no_force_reindex(capsys):
-    with TempFileName(suffix='.rsidx') as dbfile:
-        arglist = ['index', data_file('chr9-multi.vcf.gz'), dbfile]
+    with TempFileName(suffix='.rsidx') as idxfile:
+        arglist = ['index', data_file('chr9-multi.vcf.gz'), idxfile]
         args = rsidx.cli.get_parser().parse_args(arglist)
         rsidx.index.main(args)
         with pytest.raises(SystemExit):
@@ -133,8 +133,8 @@ def test_index_no_force_reindex(capsys):
 
 
 def test_index_force_reindex(capsys):
-    with TempFileName(suffix='.rsidx') as dbfile:
-        arglist = ['index', '--force', data_file('chr9-multi.vcf.gz'), dbfile]
+    with TempFileName(suffix='.rsidx') as idxfile:
+        arglist = ['index', '--force', data_file('chr9-multi.vcf.gz'), idxfile]
         args = rsidx.cli.get_parser().parse_args(arglist)
         rsidx.index.main(args)
         rsidx.index.main(args)
