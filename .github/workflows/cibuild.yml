@@ -19,6 +19,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install
       run: |
+        sudo apt-get install tabix
         python -m pip install --upgrade pip
         pip install .
         make devdeps
