@@ -27,4 +27,4 @@ clean:
 
 ## style:     check code style against PEP8
 style:
-	pycodestyle rsidx/*.py rsidx/*/*.py
+	pycodestyle --max-line-length=99 rsidx/*.py rsidx/*/*.py

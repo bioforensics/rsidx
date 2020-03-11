@@ -52,6 +52,7 @@ def test_index_bogus_rsids():
             results = list(c.execute(query))
             assert results == [(1234497371, '4', 218446)]
 
+
 def test_index_multi_rsids():
     with NamedTemporaryFile(suffix='.sqlite3') as db:
         with sqlite3.connect(db.name) as dbconn:
@@ -87,3 +88,15 @@ def test_index_cli(mainfunc):
             (548749810, '17', 1098730),
             (956322221, '17', 1227227)]
         )
+
+
+def test_index_multi(capsys):
+    vcffile = data_file('chr9-multi.vcf.gz')
+    with NamedTemporaryFile(suffix='.rsidx') as db, rsidx.open(vcffile, 'r') as vcffh:
+        with sqlite3.connect(db.name) as dbconn:
+            rsidx.index.index(dbconn, vcffh)
+        arglist = ['search', vcffile, db.name, 'rs60995877']
+        args = rsidx.cli.get_parser().parse_args(arglist)
+        rsidx.search.main(args)
+    terminal = capsys.readouterr()
+    assert terminal.out.count('\trs60995877\t') == 7
