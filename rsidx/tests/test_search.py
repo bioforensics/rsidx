@@ -65,6 +65,7 @@ def test_search_bad_rsids():
     assert outlines[0].startswith('4\t218446\trs1234497371\tC\tCA,CAA')
     conn.close()
 
+
 def test_search_multiple_rsids_single_query():
     for rsidlist in [['rs72634902'], ['rs145742571']]:
         vcffile = data_file('multiple_id.vcf.gz')
@@ -75,6 +76,7 @@ def test_search_multiple_rsids_single_query():
         assert outlines[0].startswith('1\t1900106\trs72634902;rs145742571\tT\tC,TCTC')
         conn.close()
 
+
 def test_search_multiple_rsids_multiple_query():
     for rsidlist in [['rs72634902', 'rs145742571'], ['rs145742571', 'rs72634902']]:
         vcffile = data_file('multiple_id.vcf.gz')
@@ -84,6 +86,7 @@ def test_search_multiple_rsids_multiple_query():
         assert len(outlines) == 1
         assert outlines[0].startswith('1\t1900106\trs72634902;rs145742571\tT\tC,TCTC')
         conn.close()
+
 
 def test_search_multiple_rsids_single_query():
     for rsidlist in [['rs72634902'], ['rs145742571']]:

@@ -52,6 +52,7 @@ def test_index_bogus_rsids():
             results = list(c.execute(query))
             assert results == [(1234497371, '4', 218446)]
 
+
 def test_index_multi_rsids():
     with NamedTemporaryFile(suffix='.sqlite3') as db:
         with sqlite3.connect(db.name) as dbconn:
