@@ -70,6 +70,24 @@ def test_index_multi_rsids():
             )
 
 
+def test_index_multi_rsids():
+    with NamedTemporaryFile(suffix='.sqlite3') as db:
+        with sqlite3.connect(db.name) as dbconn:
+            vcffile = data_file('multiple_id.vcf.gz')
+            with rsidx.open(vcffile, 'r') as vcffh:
+                rsidx.index.index(dbconn, vcffh)
+            c = dbconn.cursor()
+            query = (
+                'SELECT * FROM rsid_to_coord WHERE rsid IN '
+                '(72634902, 145742571)'
+            )
+            results = list(c.execute(query))
+            assert sorted(results) == sorted([
+                (72634902, '1', 1900106),
+                (145742571, '1', 1900106)]
+            )
+
+
 @pytest.mark.parametrize('mainfunc', [rsidx.index.main, rsidx.__main__.main])
 def test_index_cli(mainfunc):
     with NamedTemporaryFile(suffix='.sqlite3') as db:
@@ -87,3 +105,15 @@ def test_index_cli(mainfunc):
             (548749810, '17', 1098730),
             (956322221, '17', 1227227)]
         )
+
+
+def test_index_multi(capsys):
+    vcffile = data_file('chr9-multi.vcf.gz')
+    with NamedTemporaryFile(suffix='.rsidx') as db, rsidx.open(vcffile, 'r') as vcffh:
+        with sqlite3.connect(db.name) as dbconn:
+            rsidx.index.index(dbconn, vcffh)
+        arglist = ['search', vcffile, db.name, 'rs60995877']
+        args = rsidx.cli.get_parser().parse_args(arglist)
+        rsidx.search.main(args)
+    terminal = capsys.readouterr()
+    assert terminal.out.count('\trs60995877\t') == 7

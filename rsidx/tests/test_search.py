@@ -85,6 +85,28 @@ def test_search_multiple_rsids_multiple_query():
         assert outlines[0].startswith('1\t1900106\trs72634902;rs145742571\tT\tC,TCTC')
         conn.close()
 
+def test_search_multiple_rsids_single_query():
+    for rsidlist in [['rs72634902'], ['rs145742571']]:
+        vcffile = data_file('multiple_id.vcf.gz')
+        idxfile = data_file('multiple_id.rsidx')
+        conn = sqlite3.connect(idxfile)
+        outlines = list(rsidx.search.search(rsidlist, conn, vcffile))
+        assert len(outlines) == 1
+        assert outlines[0].startswith('1\t1900106\trs72634902;rs145742571\tT\tC,TCTC')
+        conn.close()
+
+
+def test_search_multiple_rsids_multiple_query():
+    for rsidlist in [['rs72634902', 'rs145742571'], ['rs145742571', 'rs72634902']]:
+        vcffile = data_file('multiple_id.vcf.gz')
+        idxfile = data_file('multiple_id.rsidx')
+        conn = sqlite3.connect(idxfile)
+        outlines = list(rsidx.search.search(rsidlist, conn, vcffile))
+        assert len(outlines) == 1
+        assert outlines[0].startswith('1\t1900106\trs72634902;rs145742571\tT\tC,TCTC')
+        conn.close()
+
+
 @pytest.mark.parametrize('doheader,numlines,suffix', [
     (False, 5, '.vcf'),
     (True, 62, '.vcf'),
@@ -132,4 +154,15 @@ def test_search_overlapping_variants(doheader, numlines):
     outlines = list(rsidx.search.search(rsidlist, conn, vcffile, doheader))
     assert len(outlines) == numlines
     assert '\trs8051733\t' in outlines[-1]
-    assert '\rs967556605\t' not in outlines[-1]
+    assert '\trs967556605\t' not in outlines[-1]
+
+
+def test_search_multi():
+    rsidlist = ['rs60995877']
+    vcffile = data_file('chr9-multi.vcf.gz')
+    idxfile = data_file('chr9-multi.rsidx')
+    conn = sqlite3.connect(idxfile)
+    outlines = list(rsidx.search.search(rsidlist, conn, vcffile))
+    assert len(outlines) == 7
+    for line in outlines:
+        assert line.split('\t')[2] == 'rs60995877'
