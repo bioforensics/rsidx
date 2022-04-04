@@ -145,6 +145,22 @@ def test_search_stdout(capsys):
     assert len(outlines) == 5
 
 
+def test_search_with_file(tmp_path):
+    outfile = str(tmp_path / "out.vcf")
+    arglist = [
+        'search', data_file('chr17-sample.vcf.gz'), data_file('chr17-sample.rsidx'),
+        '--file', data_file('five-rsids.txt'), '--out', outfile
+    ]
+    args = rsidx.cli.get_parser().parse_args(arglist)
+    rsidx.search.main(args)
+    with open(outfile, 'r') as fh:
+        positions = list()
+        for line in fh:
+            pos = line.split()[1]
+            positions.append(pos)
+        assert positions == ['132359', '1313935', '1458046', '1521873', '1895904']
+
+
 @pytest.mark.parametrize('doheader,numlines', [
     (False, 1),
     (True, 57 + 1),
