@@ -55,9 +55,21 @@ def search(rsidlist, dbconn, vcffile, header=False):
         yield line
 
 
+def parse_rsids(rsidlist, fromfile):
+    if fromfile is False:
+        return rsidlist
+    rsids = list()
+    for filename in rsidlist:
+        with open(filename, 'r') as fh:
+            for line in fh:
+                rsids.extend(line.strip().split())
+    return rsids
+
+
 def main(args):
+    rsidlist = parse_rsids(args.rsid, args.file)
     conn = sqlite3.connect(args.idx)
     with rsidx.open(args.out, 'w') as out:
-        for line in search(args.rsid, conn, args.vcf, header=args.header):
+        for line in search(rsidlist, conn, args.vcf, header=args.header):
             print(line, end='', file=out)
     conn.close()

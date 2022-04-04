@@ -37,6 +37,10 @@ def search_subparser(subparsers):
         '-o', '--out', metavar='FILE', help='write output to specified FILE; '
         'default is terminal (stdout)'
     )
+    cli.add_argument(
+        '--file', action='store_true', help='rsIDs are provided in a text file, one per line, '
+        'rather than as command line arguments'
+    )
     cli.add_argument('vcf', help='sorted and indexed VCF file')
     cli.add_argument('idx', help='rsidx index file')
     cli.add_argument('rsid', nargs='+', help='rsID(s) to search')
