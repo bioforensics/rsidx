@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [0.3.1] 2025-07-22
 - Upgraded vendored code for Python 3.12+ compatibility (#9)
 
