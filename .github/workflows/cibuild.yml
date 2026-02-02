@@ -2,18 +2,19 @@ name: CI Build
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
   schedule:
-    - cron: '0 4 1 * *'
+    - cron: '30 4 1 * *'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
-
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
