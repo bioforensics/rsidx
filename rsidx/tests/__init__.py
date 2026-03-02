@@ -9,14 +9,12 @@
 
 from contextlib import contextmanager
 import os
-from pkg_resources import resource_filename
+from importlib.resources import files
 from tempfile import NamedTemporaryFile
 
 
 def data_file(path):
-    pathparts = path.split('/')
-    relpath = os.path.join('tests', 'data', *pathparts)
-    return resource_filename('rsidx', relpath)
+    return str(files("rsidx") / "tests" / "data" / path)
 
 
 @contextmanager

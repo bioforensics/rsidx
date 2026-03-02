@@ -8,23 +8,16 @@ help: Makefile
 test:
 	pytest --cov=rsidx --doctest-modules rsidx/*/test_*.py
 
-## devdeps:   install development dependencies
-devdeps:
-	pip install --upgrade pip setuptools
-	pip install wheel twine
-	pip install pycodestyle pytest-cov pytest-sugar
+## style:     check code style
+style:
+	black --line-length=99 --check rsidx/*.py rsidx/*/*.py
 
+## format:    autoformat Python code
+format:
+	black --line-length=99 rsidx/*.py rsidx/*/*.py
 
-## devhooks:  install development hooks
-devhooks:
+## hooks:     install development hooks
+hooks:
 	echo 'set -eo pipefail' > .git/hooks/pre-commit
 	echo 'make style' >> .git/hooks/pre-commit
 	chmod 755 .git/hooks/pre-commit
-
-## clean:     remove development artifacts
-clean:
-	rm -rf __pycache__/ rsidx/__pycache__/ rsidx/*/__pycache__ build/ dist/ *.egg-info/
-
-## style:     check code style against PEP8
-style:
-	pycodestyle --max-line-length=99 rsidx/*.py rsidx/*/*.py
