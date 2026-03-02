@@ -7,13 +7,13 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-import argparse
-import rsidx
+from . import cli
+from importlib.metadata import version
 import sys
 
 
 def main(args=None):
-    """Entry point for the happer CLI.
+    """Entry point for the rsidx CLI.
 
     Isolated as a method so that the CLI can be called by other Python code
     (e.g. for testing), in which case the arguments are passed to the function.
@@ -22,10 +22,10 @@ def main(args=None):
     """
     if args is None:  # pragma: no cover
         if len(sys.argv) == 1:
-            rsidx.cli.get_parser().parse_args(['-h'])
-        args = rsidx.cli.get_parser().parse_args()
+            cli.get_parser().parse_args(["-h"])
+        args = cli.get_parser().parse_args()
 
-    versionmessage = '[rsidx] running version {}'.format(rsidx.__version__)
+    versionmessage = "[rsidx] running version {}".format(version("rsidx"))
     print(versionmessage, file=sys.stderr)
-    mainmethod = rsidx.cli.mains[args.subcmd]
+    mainmethod = cli.mains[args.subcmd]
     mainmethod(args)

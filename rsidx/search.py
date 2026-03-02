@@ -15,18 +15,18 @@ import sys
 
 def trim_rsid(rsid):
     rsidstr = str(rsid)
-    if rsidstr.startswith('rs'):
+    if rsidstr.startswith("rs"):
         rsidstr = rsidstr[2:]
     return rsidstr
 
 
 def filter_by_rsid(instream, rsidlist, header=False):
     for line in instream:
-        if line.startswith('#'):
+        if line.startswith("#"):
             yield line
             continue
-        chrom, coord, rsids, *values = line.split('\t')
-        for rsid in rsids.split(';'):
+        chrom, coord, rsids, *values = line.split("\t")
+        for rsid in rsids.split(";"):
             if rsid[2:] in rsidlist:
                 yield line
                 break
@@ -34,21 +34,20 @@ def filter_by_rsid(instream, rsidlist, header=False):
 
 def search(rsidlist, dbconn, vcffile, header=False):
     c = dbconn.cursor()
-    rsids = ', '.join(map(trim_rsid, rsidlist))
-    query = 'SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid IN ({:s})'.format(rsids)
+    rsids = ", ".join(map(trim_rsid, rsidlist))
+    query = "SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid IN ({:s})".format(rsids)
 
     def fmt(row):
-        return '{chr:s}:{coord:d}-{coord:d}'.format(chr=row[0], coord=row[1])
+        return "{chr:s}:{coord:d}-{coord:d}".format(chr=row[0], coord=row[1])
+
     coords = [fmt(result) for result in c.execute(query)]
     if len(coords) == 0:
-        print('[rsidx::search] WARNING: no rsID matches', file=sys.stderr)
+        print("[rsidx::search] WARNING: no rsID matches", file=sys.stderr)
         return
-    coords.sort(
-        key=lambda x: (x.split(':')[0], int(x.split(':')[1].split('-')[0]))
-    )
-    tabixcmd = ['tabix', vcffile]
+    coords.sort(key=lambda x: (x.split(":")[0], int(x.split(":")[1].split("-")[0])))
+    tabixcmd = ["tabix", vcffile]
     if header:
-        tabixcmd.append('-h')
+        tabixcmd.append("-h")
     tabixcmd.extend(coords)
     proc = Popen(tabixcmd, stdout=PIPE, universal_newlines=True)
     for line in filter_by_rsid(proc.stdout, rsids, header=header):
@@ -60,7 +59,7 @@ def parse_rsids(rsidlist, fromfile):
         return rsidlist
     rsids = list()
     for filename in rsidlist:
-        with open(filename, 'r') as fh:
+        with open(filename, "r") as fh:
             for line in fh:
                 rsids.extend(line.strip().split())
     return rsids
@@ -69,7 +68,7 @@ def parse_rsids(rsidlist, fromfile):
 def main(args):
     rsidlist = parse_rsids(args.rsid, args.file)
     conn = sqlite3.connect(args.idx)
-    with rsidx.open(args.out, 'w') as out:
+    with rsidx.open(args.out, "w") as out:
         for line in search(rsidlist, conn, args.vcf, header=args.header):
-            print(line, end='', file=out)
+            print(line, end="", file=out)
     conn.close()

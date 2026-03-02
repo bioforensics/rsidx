@@ -15,5 +15,5 @@ from tempfile import NamedTemporaryFile
 def test_open():
     with NamedTemporaryFile() as tf:
         with pytest.raises(ValueError, match=r'invalid mode "rwx"'):
-            with rsidx.open(tf.name, 'rwx') as fh:
+            with rsidx.open(tf.name, "rwx") as fh:
                 pass

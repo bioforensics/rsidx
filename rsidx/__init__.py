@@ -17,21 +17,18 @@ from rsidx import search
 from rsidx import __main__
 from rsidx import cli
 
-from . import _version
-__version__ = _version.get_versions()['version']
-
 
 @contextmanager
 def open(filename, mode):
-    if mode not in ('r', 'w'):
+    if mode not in ("r", "w"):
         raise ValueError('invalid mode "{}"'.format(mode))
-    if filename in ['-', None]:
-        filehandle = sys.stdin if mode == 'r' else sys.stdout
+    if filename in ["-", None]:
+        filehandle = sys.stdin if mode == "r" else sys.stdout
         yield filehandle
     else:
         openfunc = builtins.open
-        if filename.endswith('.gz'):
+        if filename.endswith(".gz"):
             openfunc = gzopen
-            mode += 't'
+            mode += "t"
         with openfunc(filename, mode) as filehandle:
             yield filehandle
