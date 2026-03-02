@@ -1,0 +1,33 @@
+[project]
+name = "rsidx"
+version = "0.3.2.dev"
+description = "Library for indexing VCF files for random access searches by rsID"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "Daniel Standage", email = "daniel.standage@st.dhs.gov"},
+]
+
+
+[project.optional-dependencies]
+dev = ["black==24.10", "build", "twine"]
+test = ["pytest", "pytest-cov"]
+
+
+[project.scripts]
+rsidx = "rsidx.__main__:main"
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools]
+include-package-data = true
+package-data = { rsidx = ["tests/data/**/*"] }
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rsidx*"]

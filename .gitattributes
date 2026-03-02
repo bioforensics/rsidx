@@ -1,3 +1,0 @@
-rsidx/_version.py export-subst
-rsidx/_version linguist-vendored
-versioneer.py linguist-vendored

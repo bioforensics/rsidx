@@ -25,8 +25,7 @@ jobs:
       run: |
         sudo apt-get install tabix
         python -m pip install --upgrade pip
-        pip install .
-        make devdeps
+        pip install .[dev,test]
     - name: Test with pytest
       run: make test
     - name: Style check
